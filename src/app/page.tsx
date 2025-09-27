@@ -42,12 +42,6 @@ export default function Home() {
       {isConnected || storedAddress ? (
         <div className="text-center">
           <p className="text-green-400 text-lg mb-4">🎉 Welcome! Your wallet is connected.</p>
-          <button 
-            onClick={handleDisconnect}
-            className="px-6 py-3 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition"
-          >
-            Disconnect Wallet
-          </button>
         </div>
       ) : (
         <ConnectButton />
