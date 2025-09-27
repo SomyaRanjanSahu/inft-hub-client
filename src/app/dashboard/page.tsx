@@ -139,7 +139,11 @@ export default function DashboardPage() {
             </p>
             <div className="flex gap-4">
               <button
-                onClick={() => alert(`AMA for ${selectedINFT.name}`)}
+                onClick={() =>
+                  router.push(
+                    `/dashboard/ama?my=${infts[0].id}&other=${selectedINFT.id}`
+                  )
+                }
                 className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition"
               >
                 AMA
