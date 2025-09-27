@@ -1,10 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAccount, useDisconnect } from "wagmi";
+import { useRouter } from "next/navigation";
 
 export default function CreateWalletPage() {
+  const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+  const router = useRouter();
   const [traits, setTraits] = useState([{ key: "", value: "" }]);
   const [image, setImage] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (!isConnected) {
+      router.push('/');
+    }
+  }, [isConnected, router]);
 
   const addTrait = () => {
     if (traits.length < 5) setTraits([...traits, { key: "", value: "" }]);
@@ -34,12 +45,27 @@ export default function CreateWalletPage() {
 
   const removeImage = () => setImage(null);
 
+  const handleDisconnect = () => {
+    disconnect();
+    localStorage.removeItem('walletAddress');
+    router.push('/');
+  };
+
   return (
-    <main className="flex flex-col min-h-screen items-center bg-gray-900 text-white py-10 px-4">
+    <main className="flex flex-col min-h-screen items-center bg-gray-900 text-white py-10 px-4 relative">
+      {/* Disconnect Button - Top Right */}
+      <button
+        onClick={handleDisconnect}
+        className="absolute cursor-pointer top-4 right-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+      >
+        Disconnect Wallet
+      </button>
       {/* Wallet Address */}
       <div className="mb-6 text-center">
         <p className="text-xl">Connected Wallet:</p>
-        <p className="text-violet-400 font-mono mt-1">0x1234...abcd</p>
+        <p className="text-violet-400 font-mono mt-1">
+          {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected'}
+        </p>
       </div>
 
       <hr className="mt-6 w-60"></hr>
