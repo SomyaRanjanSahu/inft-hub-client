@@ -8,6 +8,7 @@ import { uploadImageToPinata, uploadMetadataToPinata, NFTMetadata } from "@/lib/
 import { MockINFTContract, contractABI } from "../../../utils/contract";
 import { useNFTs } from "@/contexts/NFTContext";
 import INFTCard from "../component/INFTCard";
+import { createInft} from "@/lib/api";
 
 export default function CreateWalletPage() {
   const { address, isConnected, chain } = useAccount();
@@ -103,7 +104,7 @@ export default function CreateWalletPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!image || !name || !description) {
       alert("Please fill in all required fields");
       return;
@@ -135,7 +136,7 @@ export default function CreateWalletPage() {
       console.log("Uploading image to Pinata...");
       const imageUrl = await uploadImageToPinata(image);
       console.log("Image uploaded:", imageUrl);
-      
+
       // Prepare metadata
       const metadata: NFTMetadata = {
         name,
@@ -151,7 +152,22 @@ export default function CreateWalletPage() {
       console.log("Uploading metadata to Pinata...");
       const metadataUri = await uploadMetadataToPinata(metadata);
       console.log("Metadata uploaded:", metadataUri);
-      
+      try {
+        // await createINFT({
+        //   cid: metadataUri,
+        //   wallet: address,
+        //   name,
+        //   description,
+        //   traits: validTraits,
+        // });
+        await createInft(name, address, description, metadataUri, validTraits);
+
+        console.log("Backend createInft called successfully");
+      } catch (err) {
+        console.error("Failed to call backend:", err);
+      }
+
+
       // Create metadata hash (simple hash for demo)
       const metadataString = JSON.stringify(metadata);
       const encoder = new TextEncoder();
@@ -224,7 +240,7 @@ export default function CreateWalletPage() {
         >
           Test Pinata Connection
         </button>
-        
+
         <button
           type="button"
           onClick={() => {
