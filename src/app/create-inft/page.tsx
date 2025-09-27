@@ -13,7 +13,7 @@ export default function CreateWalletPage() {
 
   useEffect(() => {
     if (!isConnected) {
-      router.push('/');
+      router.push("/");
     }
   }, [isConnected, router]);
 
@@ -47,8 +47,8 @@ export default function CreateWalletPage() {
 
   const handleDisconnect = () => {
     disconnect();
-    localStorage.removeItem('walletAddress');
-    router.push('/');
+    localStorage.removeItem("walletAddress");
+    router.push("/");
   };
 
   return (
@@ -64,7 +64,9 @@ export default function CreateWalletPage() {
       <div className="mb-6 text-center">
         <p className="text-xl">Connected Wallet:</p>
         <p className="text-violet-400 font-mono mt-1">
-          {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not connected'}
+          {address
+            ? `${address.slice(0, 6)}...${address.slice(-4)}`
+            : "Not connected"}
         </p>
       </div>
 
@@ -119,12 +121,12 @@ export default function CreateWalletPage() {
               />
               <input
                 type="text"
-                placeholder="Describe trait (10-200 chars)"
+                placeholder="Describe trait (100-300 chars)"
                 value={trait.value}
                 onChange={(e) => updateTrait(index, "value", e.target.value)}
                 className="p-2 rounded bg-gray-700 text-white flex-2 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                minLength={10}
-                maxLength={200}
+                minLength={100}
+                maxLength={300}
               />
               {traits.length > 1 && (
                 <button
