@@ -61,6 +61,14 @@ export default function Home() {
         <>
           <p className="text-white text-2xl mb-4">Welcome to iNFT hub</p>
           <ConnectButton />
+          <div className="mt-6 flex gap-4">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition text-white"
+            >
+              Explore Marketplace
+            </button>
+          </div>
           <p className="text-gray-400 mt-3">Made with ❤️ by Team Compiler</p>
         </>
       )}

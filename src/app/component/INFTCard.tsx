@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
+import { getSafeImageUrl } from "@/lib/ipfs";
 
 interface Trait {
   key: string;
@@ -9,27 +11,45 @@ interface Trait {
 
 interface INFTCardProps {
   name: string;
-  image?: File | null;
+  image?: File | string | null;
   traits: Trait[];
+  tokenId?: string;
 }
 
 export default function INFTCard({ name, image, traits }: INFTCardProps) {
-  const imageUrl = image ? URL.createObjectURL(image) : null;
+  const [imageError, setImageError] = useState(false);
+  
+  const imageUrl = image 
+    ? typeof image === 'string' 
+      ? getSafeImageUrl(image)
+      : URL.createObjectURL(image)
+    : null;
 
   return (
     <div className="relative w-full h-80 rounded-2xl overflow-hidden shadow-2xl border-4 border-violet-400 animate-[glow_2s_ease-in-out_infinite] bg-black">
       {/* Top: Image */}
-      {imageUrl ? (
+      {imageUrl && !imageError ? (
         <div className="w-full h-2/3 relative overflow-hidden">
           <Image
             src={imageUrl}
             alt={name}
             fill
             className="object-cover rounded-t-2xl"
+            onError={() => {
+              console.log('Image failed to load:', imageUrl);
+              setImageError(true);
+            }}
+            unoptimized={imageUrl.includes('ipfs') || imageUrl.includes('mypinata')}
+            priority={false}
           />
         </div>
       ) : (
-        <div className="w-full h-2/3 bg-gradient-to-br from-purple-700 via-violet-600 to-pink-500 rounded-t-2xl"></div>
+        <div className="w-full h-2/3 bg-gradient-to-br from-purple-700 via-violet-600 to-pink-500 rounded-t-2xl flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-4xl mb-2">🎨</div>
+            <div className="text-sm font-medium text-white/80">iNFT Image</div>
+          </div>
+        </div>
       )}
 
       {/* Bottom: Name & Traits */}

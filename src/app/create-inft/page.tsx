@@ -1,27 +1,57 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount, useDisconnect, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from "wagmi";
 import { useRouter } from "next/navigation";
+import { sepolia } from "viem/chains";
+import { uploadImageToPinata, uploadMetadataToPinata, NFTMetadata } from "@/lib/pinata";
+import { MockINFTContract, contractABI } from "../../../utils/contract";
+import { useNFTs } from "@/contexts/NFTContext";
 import INFTCard from "../component/INFTCard";
 
 export default function CreateWalletPage() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chain } = useAccount();
   const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
   const router = useRouter();
+  const { refreshNFTs } = useNFTs();
 
   const [traits, setTraits] = useState([{ key: "", value: "" }]);
   const [image, setImage] = useState<File | null>(null);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [mintError, setMintError] = useState<string | null>(null);
 
   // New states
   const [isMinting, setIsMinting] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+
+  // Wagmi hooks for minting
+  const { writeContract, data: hash } = useWriteContract();
+  const { isLoading: isTransactionLoading, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
 
   useEffect(() => {
     if (!isConnected) {
       router.push("/");
     }
   }, [isConnected, router]);
+
+  useEffect(() => {
+    if (isTransactionSuccess) {
+      setIsMinting(false);
+      setShowPopup(true);
+      // Refresh NFTs to get the latest data
+      refreshNFTs();
+    }
+  }, [isTransactionSuccess, refreshNFTs]);
+
+  useEffect(() => {
+    if (isTransactionLoading) {
+      setIsMinting(true);
+    }
+  }, [isTransactionLoading]);
 
   const addTrait = () => {
     if (traits.length < 5) setTraits([...traits, { key: "", value: "" }]);
@@ -51,21 +81,111 @@ export default function CreateWalletPage() {
 
   const removeImage = () => setImage(null);
 
+  const testPinataConnection = async () => {
+    try {
+      // Test with a simple text file
+      const testFile = new File(['test'], 'test.txt', { type: 'text/plain' });
+      console.log('Testing Pinata connection...');
+      const result = await uploadImageToPinata(testFile);
+      console.log('Pinata test successful:', result);
+      alert('Pinata connection successful!');
+    } catch (error) {
+      console.error('Pinata test failed:', error);
+      alert('Pinata connection failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
+
   const handleDisconnect = () => {
     disconnect();
     localStorage.removeItem("walletAddress");
     router.push("/");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsMinting(true);
+    
+    if (!image || !name || !description) {
+      alert("Please fill in all required fields");
+      return;
+    }
 
-    // Simulate minting process
-    setTimeout(() => {
+    if (!address) {
+      alert("Please connect your wallet");
+      return;
+    }
+
+    // Check if user is on the correct network
+    if (chain?.id !== sepolia.id) {
+      alert("Please switch to Sepolia Testnet to mint your NFT");
+      return;
+    }
+
+    // Check if all traits have both key and value
+    const validTraits = traits.filter(trait => trait.key.trim() !== "" && trait.value.trim() !== "");
+    if (validTraits.length === 0) {
+      alert("Please add at least one complete trait (both name and value)");
+      return;
+    }
+
+    setIsMinting(true);
+    setMintError(null);
+
+    try {
+      // Upload image to Pinata
+      console.log("Uploading image to Pinata...");
+      const imageUrl = await uploadImageToPinata(image);
+      console.log("Image uploaded:", imageUrl);
+      
+      // Prepare metadata
+      const metadata: NFTMetadata = {
+        name,
+        description,
+        image: imageUrl,
+        attributes: validTraits.map(trait => ({
+          trait_type: trait.key,
+          value: trait.value
+        }))
+      };
+
+      // Upload metadata to Pinata
+      console.log("Uploading metadata to Pinata...");
+      const metadataUri = await uploadMetadataToPinata(metadata);
+      console.log("Metadata uploaded:", metadataUri);
+      
+      // Create metadata hash (simple hash for demo)
+      const metadataString = JSON.stringify(metadata);
+      const encoder = new TextEncoder();
+      const data = encoder.encode(metadataString);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      const metadataHash = `0x${hashHex}`;
+
+      console.log("Minting NFT with args:", {
+        to: address,
+        tokenURI: metadataUri,
+        encryptedURI: metadataUri,
+        metadataHash
+      });
+
+      // Mint the NFT
+      writeContract({
+        address: MockINFTContract as `0x${string}`,
+        abi: contractABI,
+        functionName: 'mint',
+        args: [
+          address,
+          metadataUri,
+          metadataUri, // Using same URI for encrypted URI (simplified for demo)
+          metadataHash
+        ]
+      });
+
+    } catch (error) {
+      console.error('Minting error:', error);
+      setMintError(error instanceof Error ? error.message : 'Failed to mint NFT');
       setIsMinting(false);
-      setShowPopup(true);
-    }, 2000);
+    }
   };
 
   return (
@@ -95,6 +215,38 @@ export default function CreateWalletPage() {
         Please describe your iNFT
       </p>
 
+      {/* Debug buttons */}
+      <div className="flex gap-2 mb-4">
+        <button
+          type="button"
+          onClick={testPinataConnection}
+          className="px-4 py-2 bg-green-600 rounded hover:bg-green-700 text-sm"
+        >
+          Test Pinata Connection
+        </button>
+        
+        <button
+          type="button"
+          onClick={() => {
+            console.log('Current chain:', chain);
+            console.log('Contract address:', MockINFTContract);
+            if (chain?.id !== sepolia.id) {
+              switchChain({ chainId: sepolia.id });
+            }
+          }}
+          className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 text-sm"
+        >
+          Switch to Sepolia Testnet ({chain?.name || 'Unknown'})
+        </button>
+      </div>
+
+      {/* Error Display */}
+      {mintError && (
+        <div className="w-full max-w-2xl mb-4 p-4 bg-red-600/20 border border-red-600 rounded-lg">
+          <p className="text-red-300 text-center">{mintError}</p>
+        </div>
+      )}
+
       {/* Form */}
       <form
         onSubmit={handleSubmit}
@@ -108,6 +260,9 @@ export default function CreateWalletPage() {
           <input
             type="text"
             placeholder="Enter iNFT name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
             className="p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
           />
         </div>
@@ -119,6 +274,8 @@ export default function CreateWalletPage() {
           </label>
           <textarea
             placeholder="Describe your iNFT (20-500 chars)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             minLength={20}
             maxLength={500}
             required
@@ -142,11 +299,10 @@ export default function CreateWalletPage() {
               />
               <input
                 type="text"
-                placeholder="Describe trait (100-300 chars)"
+                placeholder="Describe trait (e.g., 'Fire magic, powerful spells')"
                 value={trait.value}
                 onChange={(e) => updateTrait(index, "value", e.target.value)}
                 className="p-2 rounded bg-gray-700 text-white flex-2 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                minLength={100}
                 maxLength={300}
               />
               {traits.length > 1 && (
@@ -220,15 +376,30 @@ export default function CreateWalletPage() {
             <h2 className="text-xl mb-4 text-green-400">
               🎉 Congratulations! Here is your iNFT
             </h2>
-            {/* NFT UI Placeholder */}
-            <INFTCard name="My First iNFT" image={image} traits={traits} />
+            {/* NFT UI */}
+            <INFTCard name={name} image={image} traits={traits} />
 
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="mt-4 px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
-            >
-              Go to Dashboard
-            </button>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="flex-1 px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
+              >
+                Go to Dashboard
+              </button>
+              <button
+                onClick={() => {
+                  // Reset form
+                  setName("");
+                  setDescription("");
+                  setTraits([{ key: "", value: "" }]);
+                  setImage(null);
+                  setShowPopup(false);
+                }}
+                className="flex-1 px-6 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 cursor-pointer"
+              >
+                Create Another
+              </button>
+            </div>
           </div>
         </div>
       )}
