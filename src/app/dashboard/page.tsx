@@ -93,7 +93,7 @@ export default function DashboardPage() {
             Explore, Interact and Learn
           </h2>
           <button
-            onClick={() => alert("Manage your iNFT clicked")}
+            onClick={() => router.push("/dashboard/manage")}
             className="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer transition"
           >
             Manage your iNFT
