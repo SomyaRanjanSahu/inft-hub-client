@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAccount, useDisconnect } from "wagmi";
 import { useRouter } from "next/navigation";
+import INFTCard from "../component/INFTCard";
 
 export default function CreateWalletPage() {
   const { address, isConnected } = useAccount();
@@ -220,10 +221,11 @@ export default function CreateWalletPage() {
               🎉 Congratulations! Here is your iNFT
             </h2>
             {/* NFT UI Placeholder */}
-            <div className="w-full h-40 bg-violet-600 rounded mb-4"></div>
+            <INFTCard name="My First iNFT" image={image} traits={traits} />
+
             <button
               onClick={() => router.push("/dashboard")}
-              className="px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
+              className="mt-4 px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
             >
               Go to Dashboard
             </button>
