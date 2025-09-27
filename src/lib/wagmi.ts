@@ -1,4 +1,5 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+// @ts-ignore
 import { mainnet, polygon, optimism, arbitrum, base } from 'viem/chains';
 
 export const config = getDefaultConfig({
