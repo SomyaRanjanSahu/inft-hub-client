@@ -149,8 +149,10 @@ export default function DashboardPage() {
                 AMA
               </button>
               <button
-                onClick={() => alert(`Train yours for ${selectedINFT.name}`)}
-                className="px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition"
+                onClick={() =>
+                  router.push(`/dashboard/buy?my=1&other=${selectedINFT.id}`)
+                }
+                className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition"
               >
                 Train yours
               </button>
