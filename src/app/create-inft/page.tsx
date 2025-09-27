@@ -8,8 +8,13 @@ export default function CreateWalletPage() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const router = useRouter();
+
   const [traits, setTraits] = useState([{ key: "", value: "" }]);
   const [image, setImage] = useState<File | null>(null);
+
+  // New states
+  const [isMinting, setIsMinting] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     if (!isConnected) {
@@ -51,15 +56,27 @@ export default function CreateWalletPage() {
     router.push("/");
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsMinting(true);
+
+    // Simulate minting process
+    setTimeout(() => {
+      setIsMinting(false);
+      setShowPopup(true);
+    }, 2000);
+  };
+
   return (
     <main className="flex flex-col min-h-screen items-center bg-gray-900 text-white py-10 px-4 relative">
-      {/* Disconnect Button - Top Right */}
+      {/* Disconnect Button */}
       <button
         onClick={handleDisconnect}
         className="absolute cursor-pointer top-4 right-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
       >
         Disconnect Wallet
       </button>
+
       {/* Wallet Address */}
       <div className="mb-6 text-center">
         <p className="text-xl">Connected Wallet:</p>
@@ -70,16 +87,19 @@ export default function CreateWalletPage() {
         </p>
       </div>
 
-      <hr className="mt-6 w-60"></hr>
+      <hr className="mt-6 w-60" />
 
-      {/* Description Text Above Form */}
+      {/* Description Text */}
       <p className="my-6 text-center text-gray-300 text-xl">
         Please describe your iNFT
       </p>
 
       {/* Form */}
-      <form className="w-full max-w-2xl flex flex-col gap-6 bg-gray-800 p-6 rounded-lg shadow-md">
-        {/* 1. iNFT Name */}
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-2xl flex flex-col gap-6 bg-gray-800 p-6 rounded-lg shadow-md"
+      >
+        {/* iNFT Name */}
         <div className="flex flex-col">
           <label className="mb-1 font-medium">
             iNFT Name <span className="text-red-500">*</span>
@@ -91,7 +111,7 @@ export default function CreateWalletPage() {
           />
         </div>
 
-        {/* 2. Description (required) */}
+        {/* Description */}
         <div className="flex flex-col">
           <label className="mb-1 font-medium">
             Description <span className="text-red-500">*</span>
@@ -105,7 +125,7 @@ export default function CreateWalletPage() {
           ></textarea>
         </div>
 
-        {/* 3. Traits */}
+        {/* Traits */}
         <div className="flex flex-col">
           <label className="mb-2 font-medium">
             Traits (1-5) <span className="text-red-500">*</span>
@@ -150,7 +170,7 @@ export default function CreateWalletPage() {
           )}
         </div>
 
-        {/* 4. Image Upload */}
+        {/* Image Upload */}
         <div className="flex flex-col">
           <label className="mb-1 font-medium">
             Upload Image <span className="text-red-500">*</span>
@@ -184,6 +204,32 @@ export default function CreateWalletPage() {
           Create iNFT
         </button>
       </form>
+
+      {/* Loader Overlay */}
+      {isMinting && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <p className="text-xl text-white animate-pulse">Minting NFT...</p>
+        </div>
+      )}
+
+      {/* Success Popup */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg text-center w-96 shadow-lg">
+            <h2 className="text-xl mb-4 text-green-400">
+              🎉 Congratulations! Here is your iNFT
+            </h2>
+            {/* NFT UI Placeholder */}
+            <div className="w-full h-40 bg-violet-600 rounded mb-4"></div>
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
