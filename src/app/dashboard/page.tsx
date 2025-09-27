@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const { disconnect } = useDisconnect();
 
   const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
+  const [selectedINFT, setSelectedINFT] = useState<INFT | null>(null); // for modal popup
 
   const [infts] = useState<INFT[]>([
     {
@@ -84,11 +85,9 @@ export default function DashboardPage() {
 
       {/* Banner */}
       <div className="relative h-64 w-full flex items-center justify-center bg-gradient-to-r from-purple-500 via-pink-400 to-orange-400 overflow-hidden">
-        {/* Overlay Text */}
         <h1 className="absolute text-[8rem] font-bold text-white/10 select-none pointer-events-none">
           iNFTs
         </h1>
-        {/* Banner Content */}
         <div className="relative z-10 flex flex-col items-center">
           <h2 className="text-4xl font-extrabold mb-4">
             Explore, Interact and Learn
@@ -118,14 +117,49 @@ export default function DashboardPage() {
       {/* NFTs Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto px-4 mt-6">
         {sortedInfts.map((nft) => (
-          <INFTCard
+          <div
             key={nft.id}
-            name={nft.name}
-            image={nft.image}
-            traits={nft.traits}
-          />
+            onClick={() => setSelectedINFT(nft)}
+            className="cursor-pointer"
+          >
+            <INFTCard name={nft.name} image={nft.image} traits={nft.traits} />
+          </div>
         ))}
       </div>
+
+      {/* Modal Popup */}
+      {selectedINFT && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg w-80 flex flex-col items-center gap-4 shadow-lg">
+            <h2 className="text-xl font-bold text-white text-center">
+              {selectedINFT.name}
+            </h2>
+            <p className="text-gray-300 text-center">
+              What would you like to do?
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => alert(`AMA for ${selectedINFT.name}`)}
+                className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+              >
+                AMA
+              </button>
+              <button
+                onClick={() => alert(`Train yours for ${selectedINFT.name}`)}
+                className="px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition"
+              >
+                Train yours
+              </button>
+            </div>
+            <button
+              onClick={() => setSelectedINFT(null)}
+              className="mt-4 text-gray-400 hover:text-white text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
