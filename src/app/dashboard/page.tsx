@@ -165,8 +165,7 @@ export default function DashboardPage() {
                   {selectedINFT.traits.length > 0 ? (
                     selectedINFT.traits.map((trait, index) => (
                       <div key={index} className="bg-gray-700 p-2 rounded text-xs">
-                        <span className="font-medium">{trait.key}:</span>
-                        <span className="ml-2 text-gray-300">{trait.value}</span>
+                        <span className="font-medium">{trait.key}</span>
                       </div>
                     ))
                   ) : (
