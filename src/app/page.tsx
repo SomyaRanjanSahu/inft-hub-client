@@ -50,7 +50,7 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <p className="text-white text-2xl mb-4">Welcome to iNFT hub</p>
+          <p className="text-white text-2xl mb-4">Welcome to personaLink</p>
           <ConnectButton />
           <div className="mt-6 flex gap-4">
             <button

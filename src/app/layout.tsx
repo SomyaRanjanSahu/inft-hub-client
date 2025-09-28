@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "iNFT Hub",
+  title: "personaLink",
   description: "Create your iNFT that matches your personality",
 };
 
