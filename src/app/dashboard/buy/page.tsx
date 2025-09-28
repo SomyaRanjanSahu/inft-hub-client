@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useAccount } from "wagmi";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import INFTCard from "../../component/INFTCard";
 
@@ -18,38 +17,42 @@ interface INFT {
   image?: File | null;
 }
 
-function TrainYourINFTPageContent() {
+function BuyTraitsPageContent() {
   const searchParams = useSearchParams();
   const myId = Number(searchParams.get("my"));
   const otherId = Number(searchParams.get("other"));
   const router = useRouter();
 
-  const { isConnected } = useAccount();
-
-  // Dummy iNFTs
+  // Dummy iNFTs with personality traits
   const infts: INFT[] = [
     {
       id: 1,
-      name: "AI Dragon",
+      name: "Luna the Singer",
       traits: [
-        { key: "Fire Breath", value: "🔥", cost: 0.01 },
-        { key: "Flight", value: "✈️", cost: 0.02 },
+        { key: "Vocal Range", value: "🎵", cost: 0.01 },
+        { key: "Songwriting", value: "✍️", cost: 0.02 },
+        { key: "Stage Presence", value: "🎭", cost: 0.015 },
+        { key: "Music Production", value: "🎛️", cost: 0.025 },
       ],
     },
     {
       id: 2,
-      name: "Cyber Pikachu",
+      name: "Alex the Artist",
       traits: [
-        { key: "Electric Shock", value: "⚡", cost: 0.01 },
-        { key: "Speed", value: "⚡⚡", cost: 0.015 },
+        { key: "Digital Art", value: "🖥️", cost: 0.01 },
+        { key: "Color Theory", value: "🎨", cost: 0.015 },
+        { key: "3D Modeling", value: "🏗️", cost: 0.02 },
+        { key: "Animation", value: "🎬", cost: 0.03 },
       ],
     },
     {
       id: 3,
-      name: "Quantum Cat",
+      name: "Jordan the Chef",
       traits: [
-        { key: "Stealth", value: "🕶️", cost: 0.02 },
-        { key: "Quantum Jump", value: "⚛️", cost: 0.03 },
+        { key: "Culinary Skills", value: "👨‍🍳", cost: 0.01 },
+        { key: "Flavor Pairing", value: "🌶️", cost: 0.015 },
+        { key: "Presentation", value: "🍽️", cost: 0.02 },
+        { key: "Menu Planning", value: "📋", cost: 0.025 },
       ],
     },
   ];
@@ -59,10 +62,6 @@ function TrainYourINFTPageContent() {
 
   const [loadingTrait, setLoadingTrait] = useState<string | null>(null);
   const [alertMsg, setAlertMsg] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isConnected) router.push("/");
-  }, [isConnected, router]);
 
   if (!myINFT || !selectedINFT) {
     return (
@@ -87,10 +86,10 @@ function TrainYourINFTPageContent() {
     <main className="flex flex-col min-h-screen bg-gray-900 text-white py-10 px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Train Your iNFT</h1>
+        <h1 className="text-2xl font-bold">Buy Traits for Your iNFT</h1>
         <button
           onClick={() => router.push("/dashboard")}
-          className=" top-4 left-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition"
+          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition"
         >
           ← Back to Dashboard
         </button>
@@ -165,16 +164,16 @@ function TrainYourINFTPageContent() {
   );
 }
 
-export default function TrainYourINFTPage() {
+export default function BuyTraitsPage() {
   return (
     <Suspense
       fallback={
         <div className="flex items-center justify-center h-screen text-white text-xl">
-          Loading iNFT training...
+          Loading iNFT traits...
         </div>
       }
     >
-      <TrainYourINFTPageContent />
+      <BuyTraitsPageContent />
     </Suspense>
   );
 }

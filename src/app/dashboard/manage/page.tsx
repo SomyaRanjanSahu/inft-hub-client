@@ -15,16 +15,12 @@ export default function ManageINFTPage() {
   const [selectedNFT, setSelectedNFT] = useState<NFTData | null>(null);
   const [sortBy, setSortBy] = useState<"latest" | "oldest">("latest");
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/");
-    }
-  }, [isConnected, router]);
+  // Removed wallet connection check - page will always show
 
   const sortedUserNFTs = [...userNFTs].sort((a, b) => {
     const aTokenId = parseInt(a.tokenId);
     const bTokenId = parseInt(b.tokenId);
-    
+
     if (sortBy === "latest") {
       return bTokenId - aTokenId;
     }
@@ -119,7 +115,9 @@ export default function ManageINFTPage() {
           </div>
         ) : sortedUserNFTs.length === 0 ? (
           <div className="col-span-full text-center py-8">
-            <p className="text-gray-300 mb-4">You don&apos;t have any iNFTs yet.</p>
+            <p className="text-gray-300 mb-4">
+              You don&apos;t have any iNFTs yet.
+            </p>
             <button
               onClick={() => router.push("/create-inft")}
               className="px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
@@ -146,40 +144,52 @@ export default function ManageINFTPage() {
             <h2 className="text-xl font-bold text-white text-center">
               {selectedNFT.name}
             </h2>
-            
-            <INFTCard 
-              name={selectedNFT.name} 
-              image={selectedNFT.image} 
-              traits={selectedNFT.traits} 
+
+            <INFTCard
+              name={selectedNFT.name}
+              image={selectedNFT.image}
+              traits={selectedNFT.traits}
             />
-            
+
             <div className="w-full">
               <h3 className="text-lg font-semibold mb-2">Description:</h3>
-              <p className="text-gray-300 text-sm mb-4">{selectedNFT.description || "No description available"}</p>
-              
+              <p className="text-gray-300 text-sm mb-4">
+                {selectedNFT.description || "No description available"}
+              </p>
+
               <h3 className="text-lg font-semibold mb-2">Token ID:</h3>
-              <p className="text-gray-300 text-sm mb-4">#{selectedNFT.tokenId}</p>
-              
+              <p className="text-gray-300 text-sm mb-4">
+                #{selectedNFT.tokenId}
+              </p>
+
               <h3 className="text-lg font-semibold mb-2">Owner:</h3>
-              <p className="text-gray-300 text-sm mb-4 break-all">{selectedNFT.owner}</p>
-              
+              <p className="text-gray-300 text-sm mb-4 break-all">
+                {selectedNFT.owner}
+              </p>
+
               <h3 className="text-lg font-semibold mb-2">Metadata URI:</h3>
-              <p className="text-gray-300 text-xs mb-4 break-all">{selectedNFT.metadataUri}</p>
-              
+              <p className="text-gray-300 text-xs mb-4 break-all">
+                {selectedNFT.metadataUri}
+              </p>
+
               {selectedNFT.encryptedUri && (
                 <>
                   <h3 className="text-lg font-semibold mb-2">Encrypted URI:</h3>
-                  <p className="text-gray-300 text-xs mb-4 break-all">{selectedNFT.encryptedUri}</p>
+                  <p className="text-gray-300 text-xs mb-4 break-all">
+                    {selectedNFT.encryptedUri}
+                  </p>
                 </>
               )}
-              
+
               {selectedNFT.metadataHash && (
                 <>
                   <h3 className="text-lg font-semibold mb-2">Metadata Hash:</h3>
-                  <p className="text-gray-300 text-xs mb-4 break-all">{selectedNFT.metadataHash}</p>
+                  <p className="text-gray-300 text-xs mb-4 break-all">
+                    {selectedNFT.metadataHash}
+                  </p>
                 </>
               )}
-              
+
               <h3 className="text-lg font-semibold mb-2">Traits:</h3>
               <div className="space-y-2 mb-4">
                 {selectedNFT.traits.length > 0 ? (
@@ -194,7 +204,7 @@ export default function ManageINFTPage() {
                 )}
               </div>
             </div>
-            
+
             <div className="flex gap-2 w-full">
               <button
                 onClick={() => setSelectedNFT(null)}
@@ -204,11 +214,14 @@ export default function ManageINFTPage() {
               </button>
               <button
                 onClick={() => {
-                  if (selectedNFT.metadataUri.startsWith('ipfs://')) {
-                    const ipfsUrl = selectedNFT.metadataUri.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
-                    window.open(ipfsUrl, '_blank');
+                  if (selectedNFT.metadataUri.startsWith("ipfs://")) {
+                    const ipfsUrl = selectedNFT.metadataUri.replace(
+                      "ipfs://",
+                      "https://gateway.pinata.cloud/ipfs/"
+                    );
+                    window.open(ipfsUrl, "_blank");
                   } else {
-                    window.open(selectedNFT.metadataUri, '_blank');
+                    window.open(selectedNFT.metadataUri, "_blank");
                   }
                 }}
                 className="flex-1 px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition"

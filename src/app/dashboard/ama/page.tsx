@@ -33,15 +33,38 @@ function AMAChatContent() {
     setOtherId(Number(searchParams.get("other")));
   }, [searchParams]);
 
-  // Dummy data
+  // Dummy data with personality traits
   const infts: INFT[] = [
-    { id: 1, name: "AI Dragon", traits: [{ key: "Fire", value: "🔥" }] },
+    {
+      id: 1,
+      name: "Luna the Singer",
+      traits: [
+        { key: "Vocal Range", value: "🎵" },
+        { key: "Songwriting", value: "✍️" },
+        { key: "Stage Presence", value: "🎭" },
+        { key: "Music Production", value: "🎛️" },
+      ],
+    },
     {
       id: 2,
-      name: "Cyber Pikachu",
-      traits: [{ key: "Electric", value: "⚡" }],
+      name: "Alex the Artist",
+      traits: [
+        { key: "Digital Art", value: "🖥️" },
+        { key: "Color Theory", value: "🎨" },
+        { key: "3D Modeling", value: "🏗️" },
+        { key: "Animation", value: "🎬" },
+      ],
     },
-    { id: 3, name: "Quantum Cat", traits: [{ key: "Stealth", value: "🕶️" }] },
+    {
+      id: 3,
+      name: "Jordan the Chef",
+      traits: [
+        { key: "Culinary Skills", value: "👨‍🍳" },
+        { key: "Flavor Pairing", value: "🌶️" },
+        { key: "Presentation", value: "🍽️" },
+        { key: "Menu Planning", value: "📋" },
+      ],
+    },
   ];
 
   const myINFT = infts.find((n) => n.id === myId);

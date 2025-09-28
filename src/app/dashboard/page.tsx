@@ -18,7 +18,7 @@ export default function DashboardPage() {
   const sortedNFTs = [...allNFTs].sort((a, b) => {
     const aTokenId = parseInt(a.tokenId);
     const bTokenId = parseInt(b.tokenId);
-    
+
     if (sortBy === "latest") {
       return bTokenId - aTokenId; // Higher token IDs are newer
     }
@@ -71,6 +71,18 @@ export default function DashboardPage() {
               Manage your iNFT
             </button>
             <button
+              onClick={() => router.push("/dashboard/ama?my=1&other=2")}
+              className="px-6 py-3 bg-orange-600 rounded-lg hover:bg-orange-700 cursor-pointer transition"
+            >
+              AMA Chat
+            </button>
+            <button
+              onClick={() => router.push("/dashboard/buy?my=1&other=2")}
+              className="px-6 py-3 bg-yellow-600 rounded-lg hover:bg-yellow-700 cursor-pointer transition"
+            >
+              Buy Traits
+            </button>
+            <button
               onClick={handleRefresh}
               className="px-6 py-3 bg-green-600 rounded-lg hover:bg-green-700 cursor-pointer transition"
               disabled={loading}
@@ -108,7 +120,9 @@ export default function DashboardPage() {
           </div>
         ) : sortedNFTs.length === 0 ? (
           <div className="col-span-full text-center py-8">
-            <p className="text-gray-300">No NFTs found. Create your first iNFT!</p>
+            <p className="text-gray-300">
+              No NFTs found. Create your first iNFT!
+            </p>
             <button
               onClick={() => router.push("/create-inft")}
               className="mt-4 px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer"
@@ -136,35 +150,42 @@ export default function DashboardPage() {
             <h2 className="text-xl font-bold text-white text-center">
               {selectedINFT.name}
             </h2>
-            
-            <INFTCard 
-              name={selectedINFT.name} 
-              image={selectedINFT.image} 
-              traits={selectedINFT.traits} 
+
+            <INFTCard
+              name={selectedINFT.name}
+              image={selectedINFT.image}
+              traits={selectedINFT.traits}
             />
-            
+
             <div className="w-full text-sm">
               <div className="mb-3">
                 <h3 className="text-lg font-semibold mb-1">Description:</h3>
-                <p className="text-gray-300">{selectedINFT.description || "No description available"}</p>
+                <p className="text-gray-300">
+                  {selectedINFT.description || "No description available"}
+                </p>
               </div>
-              
+
               <div className="mb-3">
                 <h3 className="text-lg font-semibold mb-1">Token ID:</h3>
                 <p className="text-gray-300">#{selectedINFT.tokenId}</p>
               </div>
-              
+
               <div className="mb-3">
                 <h3 className="text-lg font-semibold mb-1">Owner:</h3>
-                <p className="text-gray-300 break-all text-xs">{selectedINFT.owner}</p>
+                <p className="text-gray-300 break-all text-xs">
+                  {selectedINFT.owner}
+                </p>
               </div>
-              
+
               <div className="mb-4">
                 <h3 className="text-lg font-semibold mb-1">Traits:</h3>
                 <div className="space-y-1">
                   {selectedINFT.traits.length > 0 ? (
                     selectedINFT.traits.map((trait, index) => (
-                      <div key={index} className="bg-gray-700 p-2 rounded text-xs">
+                      <div
+                        key={index}
+                        className="bg-gray-700 p-2 rounded text-xs"
+                      >
                         <span className="font-medium">{trait.key}</span>
                       </div>
                     ))
@@ -174,7 +195,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex flex-col gap-2 w-full">
               <p className="text-gray-300 text-center text-sm">
                 What would you like to do?
@@ -183,7 +204,12 @@ export default function DashboardPage() {
                 <button
                   onClick={() =>
                     router.push(
-                      `/dashboard/ama?my=${allNFTs.find(nft => nft.owner.toLowerCase() === address?.toLowerCase())?.tokenId || '1'}&other=${selectedINFT.tokenId}`
+                      `/dashboard/ama?my=${
+                        allNFTs.find(
+                          (nft) =>
+                            nft.owner.toLowerCase() === address?.toLowerCase()
+                        )?.tokenId || "1"
+                      }&other=${selectedINFT.tokenId}`
                     )
                   }
                   className="flex-1 px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition"
@@ -191,7 +217,11 @@ export default function DashboardPage() {
                   AMA
                 </button>
                 <button
-                  onClick={() => alert(`Train functionality coming soon for ${selectedINFT.name}`)}
+                  onClick={() =>
+                    alert(
+                      `Train functionality coming soon for ${selectedINFT.name}`
+                    )
+                  }
                   className="flex-1 px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition"
                 >
                   Train
