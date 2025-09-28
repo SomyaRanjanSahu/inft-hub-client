@@ -184,7 +184,7 @@ export default function DashboardPage() {
                 <button
                   onClick={() =>
                     router.push(
-                      `/dashboard/ama?my=${allNFTs.find(nft => nft.owner.toLowerCase() === address?.toLowerCase())?.tokenId || '1'}&other=${selectedINFT.tokenId}`
+                      `/dashboard/ama?&other=${selectedINFT.tokenId}`
                     )
                   }
                   className="flex-1 px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition"

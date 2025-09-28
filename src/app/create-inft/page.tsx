@@ -8,7 +8,8 @@ import { uploadImageToPinata, uploadMetadataToPinata, NFTMetadata } from "@/lib/
 import { MockINFTContract, contractABI } from "../../../utils/contract";
 import { useNFTs } from "@/contexts/NFTContext";
 import INFTCard from "../component/INFTCard";
-import { createInft} from "@/lib/api";
+import { createInft } from "@/lib/api";
+import { QuickNFT } from "@/lib/quick-nft";
 
 export default function CreateWalletPage() {
   const { address, isConnected, chain } = useAccount();
@@ -102,6 +103,9 @@ export default function CreateWalletPage() {
     router.push("/");
   };
 
+  // Track previous tokenId in a variable outside handleSubmit
+  let previousTokenId: number | undefined = undefined;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -152,21 +156,6 @@ export default function CreateWalletPage() {
       console.log("Uploading metadata to Pinata...");
       const metadataUri = await uploadMetadataToPinata(metadata);
       console.log("Metadata uploaded:", metadataUri);
-      try {
-        // await createINFT({
-        //   cid: metadataUri,
-        //   wallet: address,
-        //   name,
-        //   description,
-        //   traits: validTraits,
-        // });
-        await createInft(name, address, description, metadataUri, validTraits);
-
-        console.log("Backend createInft called successfully");
-      } catch (err) {
-        console.error("Failed to call backend:", err);
-      }
-
 
       // Create metadata hash (simple hash for demo)
       const metadataString = JSON.stringify(metadata);
@@ -196,6 +185,36 @@ export default function CreateWalletPage() {
           metadataHash
         ]
       });
+
+      try {
+        // Prepare payload for backend
+        let index: number;
+        if (previousTokenId === undefined) {
+          index = 13;
+        } else {
+          index = previousTokenId + 1;
+        }
+        previousTokenId = index;
+        const payload = {
+          name,
+          owner: address,
+          tag: 'general', // You can make this dynamic if needed
+          cid: metadataUri,
+          traits: JSON.stringify(validTraits), // Convert traits to JSON string
+          description,
+          inft_id: index // Get the first NFT's ID as token_id
+        };
+
+        console.log("Submitting iNFT payload:", payload);
+
+        const inft = await createInft(payload); //for agent
+        console.log(`iNFT created successfully! ID: ${inft.inft_id}`);
+        
+      } catch (err) {
+        console.error("Failed to call backend:", err);
+        // Don't return here, continue with blockchain minting
+        alert(`Backend call failed: ${err}, but continuing with blockchain minting...`);
+      }
 
     } catch (error) {
       console.error('Minting error:', error);

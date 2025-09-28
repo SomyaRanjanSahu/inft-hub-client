@@ -28,7 +28,7 @@ export default function INFTCard({ name, image, traits }: INFTCardProps) {
   return (
     <div className="relative w-full h-80 rounded-2xl overflow-hidden shadow-2xl border-4 border-violet-400 animate-[glow_2s_ease-in-out_infinite] bg-black">
       {/* Top: Image */}
-      {imageUrl && !imageError ? (
+      {/* {imageUrl && !imageError ? (
         <div className="w-full h-2/3 relative overflow-hidden">
           <Image
             src={imageUrl}
@@ -50,7 +50,7 @@ export default function INFTCard({ name, image, traits }: INFTCardProps) {
             <div className="text-sm font-medium text-white/80">iNFT Image</div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Bottom: Name & Traits */}
       <div className="flex flex-col justify-center items-center h-1/3 bg-black/80 p-4">
@@ -59,19 +59,13 @@ export default function INFTCard({ name, image, traits }: INFTCardProps) {
         </h2>
         <div className="flex flex-wrap gap-2 justify-center">
           {traits
-            .filter((t) => t.key.trim() !== "")
+            .filter((t) => typeof t.key === "string" && t.key.trim() !== "")
             .map((trait, index) => (
               <span
                 key={index}
-                className="px-3 py-1 rounded-full text-sm font-semibold text-white"
-                style={{
-                  background: `linear-gradient(135deg, hsl(${
-                    (index * 70) % 360
-                  }, 80%, 50%), hsl(${(index * 70 + 50) % 360}, 70%, 40%))`,
-                  boxShadow: `0 0 8px hsl(${(index * 70) % 360}, 80%, 50%)`,
-                }}
+                className="bg-violet-700 text-white px-2 py-1 rounded text-xs"
               >
-                {trait.key}
+                {trait.key}: {trait.value}
               </span>
             ))}
         </div>
