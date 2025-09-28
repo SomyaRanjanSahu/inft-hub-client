@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useAccount } from "wagmi";
 import { useRouter, useSearchParams } from "next/navigation";
 import INFTCard from "../../component/INFTCard";
@@ -18,7 +18,7 @@ interface INFT {
   image?: File | null;
 }
 
-export default function TrainYourINFTPage() {
+function TrainYourINFTPageContent() {
   const searchParams = useSearchParams();
   const myId = Number(searchParams.get("my"));
   const otherId = Number(searchParams.get("other"));
@@ -162,5 +162,19 @@ export default function TrainYourINFTPage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function TrainYourINFTPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-screen text-white text-xl">
+          Loading iNFT training...
+        </div>
+      }
+    >
+      <TrainYourINFTPageContent />
+    </Suspense>
   );
 }

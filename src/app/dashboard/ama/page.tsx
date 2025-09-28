@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 // import INFTCard from "../../component/INFTCard";
 import { useDisconnect } from "wagmi";
@@ -13,7 +13,14 @@ interface Message {
   timestamp: Date;
 }
 
-export default function AMAChat() {
+// interface INFT {
+//   id: number;
+//   name: string;
+//   traits: { key: string; value: string }[];
+//   image?: File | null;
+// }
+
+function AMAChatContent() {
   const router = useRouter();
   const chatEndRef = useRef<HTMLDivElement>(null);
   const { disconnect } = useDisconnect();
